@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+
+WORKDIR /key_value
+
+
+COPY ./requirements.txt /key_value/
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+COPY ./key_value /key_value/
+
+
+EXPOSE 8000
