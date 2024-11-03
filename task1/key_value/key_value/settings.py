@@ -78,7 +78,10 @@ WSGI_APPLICATION = 'key_value.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgres://myuser:mypassword@db:5432/mydb  "
+        default="postgres://myuser:mypassword@db:5432/mydb"
+    ),
+    'replica': dj_database_url.config(
+        default="postgres://myuser:mypassword@db:5433/mydb"
     )
 }
 

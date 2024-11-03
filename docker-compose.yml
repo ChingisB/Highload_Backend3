@@ -55,20 +55,38 @@ services:
       - django1
       - django2
       - django3
-
-  db:
+  
+  db_master:
     image: postgres:13
-    container_name: postgres_db
+    container_name: db_master
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
+    volumes:
+      - db_master_data:/var/lib/postgresql/data
+      - ./task4/master/postgresql.conf:/etc/postgresql/postgresql.conf  # Custom config
+      - ./task4/master/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - "5432:5432"
-    expose:
-      - 5432
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+
+  db_replica:
+    image: postgres:13
+    container_name: db_replica
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db_replica_data:/var/lib/postgresql/data
+      - ./task4/replica/recovery.conf:/var/lib/postgresql/data/recovery.conf
+    ports:
+      - "5433:5432"
+    depends_on:
+      - db_master
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
 
 volumes:
-  postgres_data:
+  db_master_data
+  db_replica_data
