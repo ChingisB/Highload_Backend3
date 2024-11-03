@@ -55,6 +55,30 @@ services:
       - django1
       - django2
       - django3
+    
+  prometheus:
+    build:
+      context: ./task5/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./task5/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - django1
+      - django2
+      - django3
+  
+  grafana:
+    build:
+      context: ./task5/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana-storage:/var/lib/grafana
   
   db_master:
     image: postgres:13
@@ -65,7 +89,7 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - db_master_data:/var/lib/postgresql/data
-      - ./task4/master/postgresql.conf:/etc/postgresql/postgresql.conf  # Custom config
+      - ./task4/master/postgresql.conf:/etc/postgresql/postgresql.conf 
       - ./task4/master/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - "5432:5432"
@@ -88,5 +112,6 @@ services:
     command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
 
 volumes:
-  db_master_data
-  db_replica_data
+  db_master_data: 
+  db_replica_data:
+  grafana-storage:
